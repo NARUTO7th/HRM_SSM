@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrmssm.dao.DepartmentMapper">
+
+    <resultMap id="DepResultMap" type="com.hrmssm.pojo.Department">
+        <id column="dep_id" property="dep_id"/>
+        <result column="dep_name" property="departmentName"/>
+    </resultMap>
+    <!--  List<Department> selectDepartments()  -->
+    <select id="selectDepartments" resultMap="DepResultMap">
+        select * from tb_department
+    </select>
+</mapper>

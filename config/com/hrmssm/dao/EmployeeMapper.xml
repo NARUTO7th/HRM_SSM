@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hrmssm.dao.EmployeeMapper">
+<!--  做项目前应先写出每个表的增删改查：查询表所有内容；
+通过pojo内的javabean增加一条数据；通过主键（id）删除一条数据；
+通过主键（id）修改一条数据；  -->
+    <resultMap id="EmpResultMap" type="com.hrmssm.pojo.Employee">
+        <id column="id" property="id"/>
+        <result column="e_no" property="e_no"/>
+        <result column="name" property="name"/>
+        <result column="gender" property="gender"/>
+        <result column="birth" property="birthday"/>
+        <result column="salary" property="salary"/>
+        <result column="image" property="image"/>
+        <association property="department"
+                     javaType="com.hrmssm.pojo.Department">
+            <id column="dep_id" property="dep_id"/>
+            <result column="dep_name" property="departmentName"/>
+        </association>
+    </resultMap>
+    <select id="selectEmployees" resultMap="EmpResultMap">
+        select e.id id,e_no,name,gender,birth,salary,d.dep_id dep_id,dep_name,image
+        from tb_employee e join tb_department d on e.id_dep = d.dep_id
+    </select>
+
+    <insert id="insertEmployeeByObject" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_employee (e_no,name,password,gender,birth,salary,image,id_dep)
+        values (#{e_no},#{name},#{password},#{gender},#{birthday},#{salary},#{image},#{department.dep_id})
+    </insert>
+
+    <delete id="deleteEmployeeById">
+        delete from tb_employee where id = #{id}
+    </delete>
+
+    <update id="updateEmployeeByObject">
+        update tb_employee
+        <set>
+            <if test="e_no != null and e_no !=''">
+                e_no = #{e_no},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            gender = #{gender},
+            birth = #{birthday},
+            salary = #{salary},
+            id_dep = #{department.dep_id},
+            <if test="image != null and image != ''">
+                image = #{image}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectEmployeeById" resultMap="EmpResultMap">
+        select e.id id,e_no,name,gender,birth,salary,d.dep_id dep_id,dep_name,image
+        from tb_employee e join tb_department d on e.id_dep = d.dep_id
+        where e.id = #{id}
+    </select>
+
+    <!--List<Student> searchByKeyword(@Param("keyword") String keyword);-->
+    <select id="searchByKeyword" resultMap="EmpResultMap">
+        select e.id id,e_no,name,gender,birth,salary,d.dep_id dep_id,dep_name,image
+        from tb_employee e join tb_department d on e.id_dep = d.dep_id
+        where
+        e_no like concat('%',#{keyword},'%') or
+        name like concat('%',#{keyword},'%') or
+        d.dep_name like concat('%',#{keyword},'%') or
+        DATE_FORMAT(birth,'%Y-%m-%d') like concat('%',#{keyword},'%')
+        salary like concat('%',#{keyword},'%') or
+        <if test='keyword == "男"'>
+            or gender = 1
+        </if>
+        <if test='keyword == "女"'>
+            or gender = 0
+        </if>
+    </select>
+
+</mapper>
